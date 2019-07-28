@@ -136,6 +136,7 @@ void bullet()
   if (pid == 0)
   {
     //child
+    close(piped[0]);
     childWork(&success, &fail);
     printf("%d:%d\n", success, fail);
     FILE* fp = fdopen(piped[1], "w");
@@ -153,6 +154,7 @@ void bullet()
   else
   {
     //parent
+    close(piped[1]);
     int i = 0,j = 0;
     FILE* fp = fdopen(piped[0], "r");
     if(fp == NULL) {
@@ -162,14 +164,14 @@ void bullet()
     setbuf(fp, NULL);
 
     // while (wait(NULL)> 0) {
-      while(fscanf(fp,  "%d:%d", &i, &j))
+      while(fscanf(fp,  "%d:%d", &i, &j) != EOF)
       {
         // printf("total: %d:%d\n", i, j);
         success += i;
         fail += j;
-        if(--concurrent == 0) {
-          break;
-        }
+        // if(--concurrent == 0) {
+        //   break;
+        // }
         // printf("%d\n", concurrent);
       }
     // }
